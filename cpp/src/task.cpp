@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <string>
+
 
 
 class Token
@@ -62,7 +62,7 @@ private:
 		////////////////////////////////////////////////
 
 
-		for (int i = '0'; i < '9'; i++) {
+		for (int i = '0'; i <= '9'; i++) {
 
 			automat[0][i] = 8;
 			automat[8][i] = 8;
@@ -138,7 +138,7 @@ public:
 		std::string newLex = "";
 
 		do {
-
+			char current = file->peek();
 			tempState = automat[currentState][file->peek()];
 
 
