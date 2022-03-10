@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string>
 
 
 
@@ -16,19 +17,26 @@ private:
 
 
 public:
-	Token(const std::string lexemp, std::string tokenp, bool eofp) :lexem(lexemp),token(tokenp), eof(eofp) {};
+	Token(const std::string lexemp, std::string tokenp, bool eofp) :lexem(lexemp), token(tokenp), eof(eofp) {};
 
-	Token() : lexem(""),token(""),eof(false) {};
+	Token() : lexem(""), token(""), eof(false) {};
 
 	std::string getLexem() {
-		return this->lexem;
+		return lexem;
 	}
 	std::string getToken() {
-		return this->token;
+		return token;
 	}
 	bool getEof() {
-		return this->eof;
+		return eof;
 	}
+
+	friend std::ostream& operator<<(std::ostream& out, const Token& aToken) {
+		out << "'" << aToken.getLexem() << "'" << aToken.getToken() << " (" << aToken.getRow() <<
+			", " << aToken.getColumn
+
+	}
+
 
 
 };
@@ -39,7 +47,7 @@ class Scanner {
 
 private:
 
-	std::ifstream* file;
+	std::istream* file;
 	int row;
 	int columm;
 	Token currentToken;
@@ -60,7 +68,7 @@ private:
 			}
 		}
 		////////////////////////////////////////////////
-	
+
 
 		for (int i = '0'; i < '9'; i++) {
 
@@ -83,7 +91,7 @@ private:
 		for (int i = 97; i < 122; i++) {
 
 			automat[0][i] = 11;
-			automat[0][i-32] = 11;
+			automat[0][i - 32] = 11;
 			automat[11][i] = 11;
 			automat[11][i - 32] = 11;
 
@@ -115,8 +123,8 @@ private:
 
 		////////////////////////////////////////////////
 	}
-  public:
-	Scanner(std::ifstream* filep) {
+public:
+	Scanner(std::istream* filep) {
 		file = filep;
 		row = 1;
 		columm = 1;
@@ -134,22 +142,22 @@ private:
 			eof = true;
 			return Token("", "lexError", eof);
 		}
-	
+
 		std::string newLex = "";
 
 		do {
 
 			tempState = automat[currentState][file->peek()];
-			
+
 
 			if (tempState != deadEnd) {
-				
+
 				if (automat[currentState][file->peek()] == 4) {
 					file->get();
 					if (file->peek() == '/') {
-					//	char current;
+						//	char current;
 						while (file->peek() != '\n') {
-						//	current = file->peek();
+							//	current = file->peek();
 							file->get();
 						}
 						//current = file->peek();
@@ -160,17 +168,18 @@ private:
 					else file->unget();
 				}
 				newLex += file->get();
-					// dve črti (komentar v kodi!)
+				// dve črti (komentar v kodi!)
 				currentState = tempState;
 			}
-			else if (finalStates[currentState]!="lexError") {
-			
-				return Token(newLex, finalStates[currentState],eof);
-				
+			else if (finalStates[currentState] != "lexError") {
+
+				return Token(newLex, finalStates[currentState], eof);
+
 			}
-			else { 
+			else {
 				file->get();
-				return getNextToken(); }
+				return getNextToken();
+			}
 
 
 		} while (true);
@@ -188,30 +197,32 @@ std::string typeFileName() {
 
 
 
-int main()
+int main(int argc, char** argv)
 {
 	std::vector<Token>tokens;
-	std::string fileName = typeFileName();
-	std::ifstream file(fileName);
-	
-		if (file.is_open()) {
+	std::ifstream ifs("email.txt");
+	std::string input;
+	ifs >> input;
+	std::cout << input << std::endl;
 
-			Scanner scan1(&file);
 
-			do{
-			tokens.push_back(scan1.getNextToken());
-			} while (!tokens[tokens.size() - 1].getEof());
 
-			//std::cout << "Made it inside!" << std::endl;
+	Scanner scan1(&ifs);
 
-			for (int i = 0; i < tokens.size() - 1; i++) {
-				std::cout << tokens[i].getToken() + "(\"" + tokens[i].getLexem() + "\") ";
-			}
-			std::cout << "\n" << std::endl;
+	do {
+		tokens.push_back(scan1.getNextToken());
+	} while (!tokens[tokens.size() - 1].getEof());
 
-		}
-		else { std::cout << "Error was unable to open file!" << std::endl; }
-	file.close();
+	//std::cout << "Made it inside!" << std::endl;
+
+	for (int i = 0; i < tokens.size() - 1; i++) {
+		std::cout << tokens[i].getToken() + "(\"" + tokens[i].getLexem() + "\") ";
+	}
+	std::cout << "\n" << std::endl;
+
+
+	//else { std::cout << "Error was unable to open file!" << std::endl; }
+//file.close();
 
 
 
