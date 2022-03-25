@@ -1,8 +1,10 @@
+#pragma once
 #ifndef SCANNER_H
 #define SCANNER_H
 #include "Token.h"
 #include <iostream>
 #include <string>
+#include <fstream>
 
 class Scanner {
 
